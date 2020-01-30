@@ -1,0 +1,13 @@
+﻿<!-- Since we are not providing anything to the user for the add species page.Therefoore, we are 
+    not using the model declaration tag.Because, the user will be only adding the species name.-->
+@{
+    ViewBag.Title = "Add";
+}
+
+<h2>Add a New Species</h2>
+
+<form method="POST" action="/Species/Add">
+    <!-- TODO: format this nicely -->
+    <div><span>Name:</span><input id="SpeciesName" type="text" name="SpeciesName" /></div>
+    <input type="submit" id="submit" value="Add Species">
+</form>

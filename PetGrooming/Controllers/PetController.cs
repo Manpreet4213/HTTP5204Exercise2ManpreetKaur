@@ -10,7 +10,9 @@ using System.Web;
 using System.Web.Mvc;
 using PetGrooming.Data;
 using PetGrooming.Models;
+using PetGrooming.Models.ViewModels;
 using System.Diagnostics;
+
 
 namespace PetGrooming.Controllers
 {
@@ -121,20 +123,30 @@ namespace PetGrooming.Controllers
             //how to get pet data of the pet that we want to update.
             //run query
             Pet selectedpet = db.Pets.SqlQuery("select * from pets where petid = @PetID",new SqlParameter("@PetID", id)).FirstOrDefault();
-            return View(selectedpet);
+            // need information about all species
+            string query = "select * from species";
+            List<Species> selectedspecies = db.Species.SqlQuery(query).ToList();
+
+            //create an instance of our viewmodel
+            UpdatePet viewmodel = new UpdatePet();
+            viewmodel.pet = selectedpet;
+            viewmodel.species = selectedspecies;
+
+            return View(viewmodel);
         }
         [HttpPost]
-        public ActionResult Update(string PetName, string PetColor, string PetNotes, double PetWeight, int id)
+        public ActionResult Update(string PetName, string PetColor, string PetNotes, double PetWeight, int id, int SpeciesID)
         {
             //Step:1 PULL DATA
-            Debug.WriteLine("I'm pulling data of " + PetName + "and " + PetColor + "and" + PetWeight + "and" + PetNotes.ToString());
+            Debug.WriteLine("I'm pulling data of " + PetName + "and " + PetColor + "and" + PetWeight + "and" + PetNotes.ToString() + "and" + SpeciesID);
             //Step:2 Updating pet details by applying Sql query
-            string query = "Update pets set PetName = @PetName, Weight = @PetWeight, color = @PetColor, Notes = @PetNotes where petid =" + id;
-            SqlParameter[] sqlparams = new SqlParameter[4];// 4 pieces of the information to update.
+            string query = "Update pets set PetName = @PetName, Weight = @PetWeight, color = @PetColor, Notes = @PetNotes, SpeciesID = @SpeciesID where petid =" + id;
+            SqlParameter[] sqlparams = new SqlParameter[5];// 5 pieces of the information to update.
             sqlparams[0] = new SqlParameter("@PetName", PetName);
             sqlparams[1] = new SqlParameter("@PetWeight", PetWeight);
             sqlparams[2] = new SqlParameter("@PetColor", PetColor);
             sqlparams[3] = new SqlParameter("@PetNotes", PetNotes);
+            sqlparams[4] = new SqlParameter("@SpeciesID", SpeciesID);
             db.Database.ExecuteSqlCommand(query,sqlparams);
             //going back to the list page of the pets 
             return RedirectToAction("List");
